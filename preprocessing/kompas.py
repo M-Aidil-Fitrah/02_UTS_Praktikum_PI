@@ -10,8 +10,8 @@ from pathlib import Path
 import pandas as pd
 
 # ==== Konfigurasi ====
-INPUT_PATH  = Path("dataset/kompas30.csv")
-OUTPUT_PATH = Path("dataset_clean/kompas30_clean.csv")
+INPUT_PATH  = Path("dataset/kompas.csv")
+OUTPUT_PATH = Path("dataset_clean/kompas_clean.csv")
 STOPWORDS   = Path("stopwords_indo.txt")
 
 # ==== Regex & helper ====

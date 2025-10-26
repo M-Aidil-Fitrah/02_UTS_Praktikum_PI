@@ -11,8 +11,8 @@ from pathlib import Path
 import pandas as pd
 
 # ==== Konfigurasi ====
-INPUT_PATH  = Path("dataset/tempo30.csv")
-OUTPUT_PATH = Path("dataset_clean/tempo30_clean.csv")
+INPUT_PATH  = Path("dataset/tempo.csv")
+OUTPUT_PATH = Path("dataset_clean/tempo_clean.csv")
 STOPWORDS   = Path("stopwords_indo.txt")
 
 # ==== Regex & helper ====
