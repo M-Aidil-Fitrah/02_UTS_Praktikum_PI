@@ -1,8 +1,5 @@
 """
-Preprocessing Tempo 30
-Fokus: case folding, tokenization, stopword removal + noise filter
-Output: hanya 'clean_tokens'
-Catatan: angka DIPERTAHANKAN (tahun/tanggal berguna).
+Preprocessing Tempo 30 (hapus angka juga)
 """
 from __future__ import annotations
 import argparse
@@ -10,19 +7,18 @@ import re
 from pathlib import Path
 import pandas as pd
 
-# ==== Konfigurasi ====
 INPUT_PATH  = Path("dataset/tempo.csv")
 OUTPUT_PATH = Path("dataset_clean/tempo_clean.csv")
 STOPWORDS   = Path("stopwords_indo.txt")
 
-# ==== Regex & helper ====
 _URL_RE   = re.compile(r"https?://\S+|www\.\S+", re.IGNORECASE)
 _MENTION  = re.compile(r"@[\w_]+", re.UNICODE)
 _HASHTAG  = re.compile(r"#")
-_NONALPHA = re.compile(r"[^a-z0-9\s]", re.UNICODE)          # TEMPO: izinkan angka
+_NONALPHA = re.compile(r"[^a-z\s]", re.UNICODE)   # angka dihapus juga
 _MULTISP  = re.compile(r"\s+")
 _REP3     = re.compile(r"(.)\1{2,}")
 _VOWEL    = re.compile(r"[aeiou]")
+_DIGIT_ONLY = re.compile(r"^\d+$")
 
 COMMON_TEXT_COLS = ['content','text','isi','artikel','judul','title','body','description']
 
@@ -41,17 +37,18 @@ def _normalize(text: str) -> str:
     t = _URL_RE.sub(" ", t)
     t = _MENTION.sub(" ", t)
     t = _HASHTAG.sub(" ", t)
-    t = _NONALPHA.sub(" ", t)    # buang non alfanumerik
+    t = _NONALPHA.sub(" ", t)
     t = _MULTISP.sub(" ", t).strip()
     return t
 
 def _is_noise(token: str, min_len: int = 3) -> bool:
-    # terlalu pendek, tak ada vokal (untuk token alfabetik), atau huruf sama berulang ≥3
     if len(token) < min_len:
         return True
-    if token.isalpha() and not _VOWEL.search(token):
+    if not _VOWEL.search(token):
         return True
     if _REP3.search(token):
+        return True
+    if _DIGIT_ONLY.match(token):
         return True
     return False
 
@@ -81,7 +78,7 @@ def run(text_col: str | None = None):
     out = pd.DataFrame({"clean_tokens": clean_tokens})
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     out.to_csv(OUTPUT_PATH, index=False)
-    print(f"[✓] Tempo selesai: {len(out)} baris (kolom teks='{col}').")
+    print(f"[✓] Tempo selesai: {len(out)} baris (tanpa angka).")
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
