@@ -28,6 +28,7 @@ _REP3     = re.compile(r"(.)\1{2,}")
 _VOWEL    = re.compile(r"[aeiou]")
 _DIGIT_ONLY = re.compile(r"^\d+$")
 _ENWORD   = re.compile(r"^[a-z]+$")
+_DUP_WORD = re.compile(r"\b([a-z]+)-\1\b")  # deteksi kata berulang seperti 'jalan-jalan'
 
 COMMON_TEXT_COLS = ['content','text','isi','artikel','judul','title','body','description']
 
@@ -42,6 +43,7 @@ def _normalize(text: str) -> str:
     if not isinstance(text, str):
         text = "" if text is None else str(text)
     t = text.lower()
+    t = _DUP_WORD.sub(" ", t)   # hapus kata berulang sebelum lanjut proses
     t = _URL_RE.sub(" ", t)
     t = _MENTION.sub(" ", t)
     t = _HASHTAG.sub(" ", t)
@@ -70,6 +72,7 @@ def _stem_hybrid(tok: str) -> str:
     return tok
 
 def tokenize(text: str) -> list[str]:
+    """Tokenisasi + hilangkan kata berulang."""
     return _normalize(text).split()
 
 def preprocess_text(text: str) -> list[str]:
