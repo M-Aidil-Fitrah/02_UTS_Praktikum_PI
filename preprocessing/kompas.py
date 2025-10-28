@@ -1,22 +1,24 @@
 """
-Preprocessing Kompas 30 (tanpa angka)
+Preprocessing Kompas 30
+Fokus: case folding, tokenization, stopword removal (Sastrawi)
+Output: hanya 'clean_tokens' (tanpa angka)
 """
 from __future__ import annotations
 import argparse
 import re
 from pathlib import Path
 import pandas as pd
+from Sastrawi.StopWordRemover.StopWordRemoverFactory import StopWordRemoverFactory
 
 # ==== Konfigurasi ====
-INPUT_PATH  = Path("dataset/kompas.csv")
-OUTPUT_PATH = Path("dataset_clean/kompas_clean.csv")
-STOPWORDS   = Path("stopwords_indo.txt")
+INPUT_PATH  = Path("dataset/kompas30.csv")
+OUTPUT_PATH = Path("dataset_clean/kompas30_clean.csv")
 
 # ==== Regex & helper ====
 _URL_RE   = re.compile(r"https?://\S+|www\.\S+", re.IGNORECASE)
 _MENTION  = re.compile(r"@[\w_]+", re.UNICODE)
 _HASHTAG  = re.compile(r"#")
-_NONALPHA = re.compile(r"[^a-z\s]", re.UNICODE)   # hanya huruf a-z
+_NONALPHA = re.compile(r"[^a-z\s]", re.UNICODE)  # hanya huruf a-z
 _MULTISP  = re.compile(r"\s+")
 _REP3     = re.compile(r"(.)\1{2,}")
 _VOWEL    = re.compile(r"[aeiou]")
@@ -24,13 +26,9 @@ _DIGIT_ONLY = re.compile(r"^\d+$")
 
 COMMON_TEXT_COLS = ['content','text','isi','artikel','judul','title','body','description']
 
-def load_stopwords(path: Path) -> set[str]:
-    stops = set()
-    for line in path.read_text(encoding="utf-8").splitlines():
-        w = line.strip().lower()
-        if w and not w.startswith("#"):
-            stops.add(w)
-    return stops
+# ==== Load stopwords dari Sastrawi ====
+factory = StopWordRemoverFactory()
+SASTRAWI_STOPWORDS = set(factory.get_stop_words())
 
 def _normalize(text: str) -> str:
     if not isinstance(text, str):
@@ -57,9 +55,9 @@ def _is_noise(token: str, min_len: int = 3) -> bool:
 def tokenize(text: str) -> list[str]:
     return _normalize(text).split()
 
-def preprocess_text(text: str, stopwords: set[str]) -> list[str]:
+def preprocess_text(text: str) -> list[str]:
     toks = tokenize(text)
-    toks = [t for t in toks if t not in stopwords]
+    toks = [t for t in toks if t not in SASTRAWI_STOPWORDS]
     toks = [t for t in toks if not _is_noise(t)]
     return toks
 
@@ -74,13 +72,12 @@ def pick_text_column(df: pd.DataFrame, forced: str | None):
 
 def run(text_col: str | None = None):
     df = pd.read_csv(INPUT_PATH)
-    stops = load_stopwords(STOPWORDS)
     col = pick_text_column(df, text_col)
-    clean_tokens = [preprocess_text(x, stops) for x in df[col].tolist()]
+    clean_tokens = [preprocess_text(x) for x in df[col].tolist()]
     out = pd.DataFrame({"clean_tokens": clean_tokens})
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     out.to_csv(OUTPUT_PATH, index=False)
-    print(f"[✓] Kompas selesai: {len(out)} baris (tanpa angka).")
+    print(f"[✓] Kompas selesai: {len(out)} baris, tanpa angka, pakai stopword Sastrawi.")
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
