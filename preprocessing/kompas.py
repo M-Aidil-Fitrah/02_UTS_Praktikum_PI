@@ -12,8 +12,8 @@ from Sastrawi.StopWordRemover.StopWordRemoverFactory import StopWordRemoverFacto
 from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 
 # ==== Konfigurasi ====
-INPUT_PATH  = Path("dataset/kompas30.csv")
-OUTPUT_PATH = Path("dataset_clean/kompas30_clean.csv")
+INPUT_PATH  = Path("dataset/kompas.csv")
+OUTPUT_PATH = Path("dataset_clean/kompas_clean.csv")
 
 # ==== Regex & helper ====
 _URL_RE   = re.compile(r"https?://\S+|www\.\S+", re.IGNORECASE)
