@@ -1,6 +1,6 @@
 """
 Preprocessing Kompas 30
-Fokus: case folding, tokenization, stopword removal (Sastrawi)
+Fokus: case folding, tokenization, stopword removal + stemming (Sastrawi)
 Output: hanya 'clean_tokens' (tanpa angka)
 """
 from __future__ import annotations
@@ -9,10 +9,11 @@ import re
 from pathlib import Path
 import pandas as pd
 from Sastrawi.StopWordRemover.StopWordRemoverFactory import StopWordRemoverFactory
+from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 
 # ==== Konfigurasi ====
-INPUT_PATH  = Path("dataset/kompas.csv")
-OUTPUT_PATH = Path("dataset_clean/kompas_clean.csv")
+INPUT_PATH  = Path("dataset/kompas30.csv")
+OUTPUT_PATH = Path("dataset_clean/kompas30_clean.csv")
 
 # ==== Regex & helper ====
 _URL_RE   = re.compile(r"https?://\S+|www\.\S+", re.IGNORECASE)
@@ -26,9 +27,10 @@ _DIGIT_ONLY = re.compile(r"^\d+$")
 
 COMMON_TEXT_COLS = ['content','text','isi','artikel','judul','title','body','description']
 
-# ==== Load stopwords dari Sastrawi ====
-factory = StopWordRemoverFactory()
-SASTRAWI_STOPWORDS = set(factory.get_stop_words())
+# ==== Sastrawi: stopword & stemmer ====
+_sw_factory = StopWordRemoverFactory()
+STOPWORDS = set(_sw_factory.get_stop_words())
+_stemmer = StemmerFactory().create_stemmer()
 
 def _normalize(text: str) -> str:
     if not isinstance(text, str):
@@ -37,19 +39,15 @@ def _normalize(text: str) -> str:
     t = _URL_RE.sub(" ", t)
     t = _MENTION.sub(" ", t)
     t = _HASHTAG.sub(" ", t)
-    t = _NONALPHA.sub(" ", t)
+    t = _NONALPHA.sub(" ", t)    # hapus angka & simbol
     t = _MULTISP.sub(" ", t).strip()
     return t
 
 def _is_noise(token: str, min_len: int = 3) -> bool:
-    if len(token) < min_len:
-        return True
-    if not _VOWEL.search(token):
-        return True
-    if _REP3.search(token):
-        return True
-    if _DIGIT_ONLY.match(token):
-        return True
+    if len(token) < min_len: return True
+    if not _VOWEL.search(token): return True
+    if _REP3.search(token): return True
+    if _DIGIT_ONLY.match(token): return True
     return False
 
 def tokenize(text: str) -> list[str]:
@@ -57,7 +55,13 @@ def tokenize(text: str) -> list[str]:
 
 def preprocess_text(text: str) -> list[str]:
     toks = tokenize(text)
-    toks = [t for t in toks if t not in SASTRAWI_STOPWORDS]
+    # stopword removal (pra-stem)
+    toks = [t for t in toks if t not in STOPWORDS]
+    # stemming
+    toks = [_stemmer.stem(t) for t in toks]
+    # stopword removal lagi (pasca-stem)
+    toks = [t for t in toks if t not in STOPWORDS]
+    # noise filter
     toks = [t for t in toks if not _is_noise(t)]
     return toks
 
@@ -77,7 +81,7 @@ def run(text_col: str | None = None):
     out = pd.DataFrame({"clean_tokens": clean_tokens})
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     out.to_csv(OUTPUT_PATH, index=False)
-    print(f"[✓] Kompas selesai: {len(out)} baris, tanpa angka, pakai stopword Sastrawi.")
+    print(f"[✓] Kompas selesai: {len(out)} baris, stopword+stemming Sastrawi, tanpa angka.")
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
