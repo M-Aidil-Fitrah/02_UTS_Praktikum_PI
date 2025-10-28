@@ -10,8 +10,8 @@ from pathlib import Path
 import pandas as pd
 from Sastrawi.StopWordRemover.StopWordRemoverFactory import StopWordRemoverFactory
 
-INPUT_PATH  = Path("dataset/tempo30.csv")
-OUTPUT_PATH = Path("dataset_clean/tempo30_clean.csv")
+INPUT_PATH  = Path("dataset/tempo.csv")
+OUTPUT_PATH = Path("dataset_clean/tempo_clean.csv")
 
 _URL_RE   = re.compile(r"https?://\S+|www\.\S+", re.IGNORECASE)
 _MENTION  = re.compile(r"@[\w_]+", re.UNICODE)
