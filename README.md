@@ -248,9 +248,9 @@ Range: [0, 1]
 
 ## 👥 Tim Pengembang
 
-- **Anggota 1** - [Nama]
-- **Anggota 2** - [Nama]
-- **Anggota 3** - [Nama]
+- **Anggota 1** - Shaldi Shauqi
+- **Anggota 2** - Muhammad Aidil Fitrah
+- **Anggota 3** - Ikram Al Ghiffari
 
 ## 📄 Lisensi
 
