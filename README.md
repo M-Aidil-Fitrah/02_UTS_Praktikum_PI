@@ -89,7 +89,7 @@ UTS-Prak-PI-A/
 │   ├── mojok.py
 │   └── tempo.py
 ├── bow.ipynb                   # Notebook untuk BoW dan Indexing
-├── ui.py                       # Main CLI application
+├── main.py                       # Main CLI application
 ├── requirements.txt            # Dependencies
 └── README.md                   # Dokumentasi
 ```
@@ -99,7 +99,7 @@ UTS-Prak-PI-A/
 ### Menjalankan Sistem
 
 ```bash
-python ui.py
+python main.py
 ```
 
 ### Menu Utama
