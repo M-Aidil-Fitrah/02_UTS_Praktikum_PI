@@ -1,7 +1,6 @@
 # Information Retrieval System - UTS Praktikum PI
 
 **UTS Praktikum Penelusuran Informasi**  
-Departemen Informatika FMIPA, Universitas Syiah Kuala
 
 ## 📋 Deskripsi Proyek
 
@@ -252,20 +251,3 @@ Range: [0, 1]
 - **Anggota 2** - Muhammad Aidil Fitrah
 - **Anggota 3** - Ikram Al Ghiffari
 
-## 📄 Lisensi
-
-Project ini dibuat untuk keperluan akademis UTS Praktikum Penelusuran Informasi.
-
-## 🙏 Acknowledgments
-
-- **Dosen Pengampu:**
-  - Prof. Dr. Taufik Fuadi Abidin, S.Si., M.Tech
-  - Fathia Sabrina, S.T., M.Inf.Tech
-  - Fitria Nilamsari, S.Kom., M.Sc
-
-- **Departemen Informatika FMIPA**
-- **Universitas Syiah Kuala**
-
----
-
-**© 2025 - UTS Praktikum Penelusuran Informasi**
